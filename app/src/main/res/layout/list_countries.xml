@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/padding_4dp">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+        android:text="Search And Select Country : "
+        android:id="@+id/lbl_contactbook"
+        android:textColor="@color/black"
+        android:textStyle="bold|italic"
+        android:layout_marginTop="5dp"
+        android:gravity="left"
+        android:typeface="serif" />
+
+    <SearchView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchView"
+        android:background="@drawable/border_round_corners" />
+
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView_custom_records"
+        android:descendantFocusability="blocksDescendants"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/border_round_corners"
+        android:layout_weight="1" />
+</LinearLayout>
