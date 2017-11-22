@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.unleashed.android.androidhackathontg.JSONReaderTask;
+import com.unleashed.android.androidhackathontg.JSONReaderTaskListener;
 import com.unleashed.android.androidhackathontg.R;
 import com.unleashed.android.androidhackathontg.customadapter.CountryListRowItem;
 import com.unleashed.android.androidhackathontg.customadapter.CustomListViewAdapter;
@@ -47,9 +50,10 @@ public class ItemListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
 
+    private View recyclerView;
 
     public CustomListViewAdapter customListViewAdapterObj;
-    private Context mContext;
+
 
     // Create an Array of Items and a ArrayAdapter around it.
     public static ArrayList<CountryListRowItem> countryListRowItems = null;
@@ -64,7 +68,7 @@ public class ItemListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        mContext = this;
+        Constants.mContext = this;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -84,9 +88,9 @@ public class ItemListActivity extends AppCompatActivity {
         }
 
 
-        View recyclerView = findViewById(R.id.item_list);
+        recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+
     }
 
     @Override
@@ -98,16 +102,48 @@ public class ItemListActivity extends AppCompatActivity {
 
     }
 
+
+    private JSONReaderTaskListener jsonReaderTaskListener = new JSONReaderTaskListener() {
+        @Override
+        public void onTaskDone(String responseData) {
+            //parse JSON data
+            try {
+                JSONArray jArray = new JSONArray(responseData);
+                JSONArrayDataBase.setJsonArray(jArray);
+            } catch (JSONException e) {
+                Log.e("JSONException", "Error: " + e.toString());
+            }
+
+            // Store data received from network to persistant storage
+            Constants.JSON_response = responseData;
+            String temp_data_received = "{ \"root\" :" + Constants.JSON_response + "}";
+            JSONPersistentStorage.storeJSONArray(getApplicationContext(), temp_data_received);
+
+            getRealData();
+        }
+
+        @Override
+        public void onError() {
+            Constants.JSON_response = "";
+        }
+    };
+
     private void read_and_populate_databases() {
+
 
         String attempt1 = JSONPersistentStorage.getJSONArray(getApplicationContext());
         if(attempt1.isEmpty()){
-            // Store data received from network to persistant storage
-            String temp_data_received = "{ \"root\" :" + Constants.JSON_response + "}";
-            JSONPersistentStorage.storeJSONArray(getApplicationContext(), temp_data_received);
+            // Get the data from network via Task.
+            JSONReaderTask jsonReaderTask = new JSONReaderTask(jsonReaderTaskListener);
+            jsonReaderTask.execute();
+        } else {
+            getRealData();
         }
 
+    }
 
+
+    private void getRealData(){
         // Read back string from Persistant storage
         String read_back_data = JSONPersistentStorage.getJSONArray(getApplicationContext());
 
@@ -120,8 +156,8 @@ public class ItemListActivity extends AppCompatActivity {
         // Convert JSON Array into Custom List Loader
         populateAdapter(JSONArrayDataBase.getJsonArray(), CountryListRowItemDataBase.getInstance().getValues());
 
+        setupRecyclerView((RecyclerView) recyclerView);
     }
-
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 
@@ -130,14 +166,14 @@ public class ItemListActivity extends AppCompatActivity {
                 mTwoPane));
     }
 
-    public void populateAdapter(JSONArray jsonArray, ArrayList<CountryListRowItem> RowItems) {
+    public void populateAdapter(JSONArray jsonArray, ArrayList<CountryListRowItem> rowItems) {
         int jsonArrayEntries = jsonArray.length();
         String country_name = null;
         String flag_url = null;
 
         try {
-            // Check if RowItems is already initialized. If yes, then skip populating.
-            if(!RowItems.isEmpty())
+            // Check if rowItems are already initialized. If yes, then skip populating.
+            if(!rowItems.isEmpty())
                 return;
 
             //Iterate the jsonArray and print the info of JSONObjects
@@ -157,7 +193,7 @@ public class ItemListActivity extends AppCompatActivity {
                 flag_url = jsonObject.optString("flag").toString();
                 item.setCountryFlagURL(flag_url);
 
-                RowItems.add(item);
+                rowItems.add(item);
             }
         } catch (JSONException e) {
             e.printStackTrace();

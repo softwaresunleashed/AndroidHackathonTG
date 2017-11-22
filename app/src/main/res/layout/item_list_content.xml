@@ -25,13 +25,6 @@
             android:layout_weight="1.5"
             android:id="@+id/LinearLayout_custom" >
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageView3"
-                android:src="@drawable/user_default_image"
-                android:scaleType="center" />
-
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
