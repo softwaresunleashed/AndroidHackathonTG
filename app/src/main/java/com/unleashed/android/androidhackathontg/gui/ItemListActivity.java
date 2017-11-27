@@ -6,13 +6,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +28,7 @@ import com.unleashed.android.androidhackathontg.JSONReaderTaskListener;
 import com.unleashed.android.androidhackathontg.R;
 import com.unleashed.android.androidhackathontg.customadapter.CountryListRowItem;
 import com.unleashed.android.androidhackathontg.customadapter.CustomListViewAdapter;
+import com.unleashed.android.androidhackathontg.customadapter.SimpleItemRecyclerViewAdapter;
 import com.unleashed.android.androidhackathontg.data.CountryListRowItemDataBase;
 import com.unleashed.android.androidhackathontg.data.JSONArrayDataBase;
 import com.unleashed.android.androidhackathontg.helpers.constants.Constants;
@@ -54,6 +61,7 @@ public class ItemListActivity extends AppCompatActivity {
 
     public CustomListViewAdapter customListViewAdapterObj;
 
+    public SimpleItemRecyclerViewAdapter mAdapterRecyclerView;
 
     // Create an Array of Items and a ArrayAdapter around it.
     public static ArrayList<CountryListRowItem> countryListRowItems = null;
@@ -91,6 +99,42 @@ public class ItemListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_list, menu);
+
+        MenuItem search = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        search(searchView);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void search(SearchView searchView) {
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                mAdapterRecyclerView.getFilter().filter(newText);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -161,9 +205,10 @@ public class ItemListActivity extends AppCompatActivity {
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this,
+        mAdapterRecyclerView = new SimpleItemRecyclerViewAdapter(this,
                 CountryListRowItemDataBase.getInstance().getValues(),
-                mTwoPane));
+                mTwoPane);
+        recyclerView.setAdapter(mAdapterRecyclerView);
     }
 
     public void populateAdapter(JSONArray jsonArray, ArrayList<CountryListRowItem> rowItems) {
@@ -180,10 +225,8 @@ public class ItemListActivity extends AppCompatActivity {
             for(int i=0; i < jsonArrayEntries; i++){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-
                 // Add Country items to Adapter
                 CountryListRowItem item = new CountryListRowItem();
-
 
                 // Set Individual Record Items.
                 item.setId(i);
@@ -197,86 +240,6 @@ public class ItemListActivity extends AppCompatActivity {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-        private final ItemListActivity mParentActivity;
-        private ArrayList<CountryListRowItem> mValues = CountryListRowItemDataBase.getInstance().getValues();
-        private final boolean mTwoPane;
-
-
-        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CountryListRowItem item = (CountryListRowItem) view.getTag();
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, Integer.toString(item.getId()));
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else {
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, Integer.toString(item.getId()));
-
-                    context.startActivity(intent);
-                }
-            }
-        };
-
-        SimpleItemRecyclerViewAdapter(ItemListActivity parent,
-                                      ArrayList<CountryListRowItem> items,
-                                      boolean twoPane) {
-            mValues = items;
-            mParentActivity = parent;
-            mTwoPane = twoPane;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            // Set Country Name
-            holder.mCountryName.setText(mValues.get(position).getCountryName());
-
-            // Set Country Flag
-            //holder.mFlagImage.setText(mValues.get(position).getCountryFlagURL());
-            Glide.with(this.mParentActivity)
-                    .load(mValues.get(position).getCountryFlagURL())
-                    .centerCrop()
-                    .placeholder(R.drawable.user_default_image)
-                    .crossFade()
-                    .into(holder.mFlagImage);
-
-            holder.itemView.setTag(mValues.get(position));
-            holder.itemView.setOnClickListener(mOnClickListener);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mCountryName;
-            final ImageView mFlagImage;
-
-            ViewHolder(View view) {
-                super(view);
-                mCountryName = (TextView) view.findViewById(R.id.tv_countryname);
-                mFlagImage = (ImageView) view.findViewById(R.id.iv_countryflag);
-            }
         }
     }
 }
