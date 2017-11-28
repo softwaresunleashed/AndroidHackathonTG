@@ -1,4 +1,4 @@
-package com.unleashed.android.androidhackathontg;
+package com.unleashed.android.androidhackathontg.helpers.interfaces;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;

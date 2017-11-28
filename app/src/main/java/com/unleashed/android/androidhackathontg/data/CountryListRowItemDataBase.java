@@ -16,10 +16,6 @@ public class CountryListRowItemDataBase {
 
         return ourInstance.mValues;
     }
-//
-//    public void setmValues(List<CountryListRowItem> mValues) {
-//        this.mValues = mValues;
-//    }
 
     private static ArrayList<CountryListRowItem> mValues = null;
 

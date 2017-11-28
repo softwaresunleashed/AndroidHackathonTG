@@ -3,6 +3,9 @@ package com.unleashed.android.androidhackathontg.customadapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +22,9 @@ import com.unleashed.android.androidhackathontg.gui.ItemDetailActivity;
 import com.unleashed.android.androidhackathontg.gui.ItemDetailFragment;
 import com.unleashed.android.androidhackathontg.gui.ItemListActivity;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class SimpleItemRecyclerViewAdapter
         extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
@@ -30,7 +35,6 @@ public class SimpleItemRecyclerViewAdapter
     private ArrayList<CountryListRowItem> mValuesFilteredList; // = CountryListRowItemDataBase.getInstance().getValues();
     private final boolean mTwoPane;
     private SimpleItemRecyclerViewAdapter instance;
-
 
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -82,12 +86,14 @@ public class SimpleItemRecyclerViewAdapter
 
         // Set Country Flag
         //holder.mFlagImage.setText(mValues.get(position).getCountryFlagURL());
-        Glide.with(this.mParentActivity)
-                .load(mValues.get(position).getCountryFlagURL())
-                .centerCrop()
-                .placeholder(R.drawable.user_default_image)
-                .crossFade()
-                .into(holder.mFlagImage);
+                Glide.with(this.mParentActivity)
+                        .load(mValues.get(position).getCountryFlagURL())
+                        .centerCrop()
+                        .placeholder(R.drawable.user_default_image)
+                        .crossFade()
+                        .into(holder.mFlagImage);
+
+
 
         holder.itemView.setTag(mValues.get(position));
         holder.itemView.setOnClickListener(mOnClickListener);
@@ -132,6 +138,7 @@ public class SimpleItemRecyclerViewAdapter
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 mValuesFilteredList = (ArrayList<CountryListRowItem>) results.values;
+
                 notifyDataSetChanged();
             }
         };

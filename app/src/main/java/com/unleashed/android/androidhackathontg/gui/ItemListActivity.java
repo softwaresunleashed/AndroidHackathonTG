@@ -1,7 +1,5 @@
 package com.unleashed.android.androidhackathontg.gui;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -12,19 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.unleashed.android.androidhackathontg.JSONReaderTask;
-import com.unleashed.android.androidhackathontg.JSONReaderTaskListener;
+import com.unleashed.android.androidhackathontg.helpers.interfaces.JSONReaderTask;
+import com.unleashed.android.androidhackathontg.helpers.interfaces.JSONReaderTaskListener;
 import com.unleashed.android.androidhackathontg.R;
 import com.unleashed.android.androidhackathontg.customadapter.CountryListRowItem;
 import com.unleashed.android.androidhackathontg.customadapter.CustomListViewAdapter;
