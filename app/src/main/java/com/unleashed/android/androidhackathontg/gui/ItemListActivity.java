@@ -99,6 +99,7 @@ public class ItemListActivity extends AppCompatActivity {
 
         MenuItem search = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        searchView.setQueryHint("Enter Country Name...");
         search(searchView);
 
         return true;

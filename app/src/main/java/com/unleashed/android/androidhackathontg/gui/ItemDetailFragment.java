@@ -1,5 +1,7 @@
 package com.unleashed.android.androidhackathontg.gui;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -10,9 +12,22 @@ import android.widget.TextView;
 
 import com.unleashed.android.androidhackathontg.R;
 import com.unleashed.android.androidhackathontg.customadapter.CountryListRowItem;
+import com.unleashed.android.androidhackathontg.customadapter.CountryTableCols;
+import com.unleashed.android.androidhackathontg.customadapter.CountryTableDataAdapter;
 import com.unleashed.android.androidhackathontg.data.CountryListRowItemDataBase;
+import com.unleashed.android.androidhackathontg.data.JSONArrayDataBase;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import de.codecrafters.tableview.TableView;
+import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
+import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -32,24 +47,20 @@ public class ItemDetailFragment extends Fragment {
      */
     private CountryListRowItem mItem;
     private ArrayList<CountryListRowItem> mItemArrayList;
+//    private List<CountryTableCols> data_to_show;
+//    private Context mContextFragment;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public ItemDetailFragment() {
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-
-        }
     }
 
     @Override
@@ -57,9 +68,52 @@ public class ItemDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
 
+//        mContextFragment = this.getContext();
+
+//        TableView tableView = (TableView) rootView.findViewById(R.id.tableView);
+//        data_to_show = new ArrayList<CountryTableCols>();
+
         String index = getArguments().getString(ARG_ITEM_ID);
+        int index_int = Integer.valueOf(index);
+
+        JSONObject jsonObject = null;
+        StringBuilder sbCountryDetails = new StringBuilder();
+
+        try {
+            JSONArray jsonArray = JSONArrayDataBase.getJsonArray();
+            jsonObject = jsonArray.getJSONObject(index_int);
+
+            Iterator<String> keys = jsonObject.keys();
+            while( keys.hasNext() ){
+                String key = keys.next();
+                String value = jsonObject.optString(key);
+
+                if(value.startsWith("[")){
+                    value = getArrayItems(value);
+                }
+
+                key = key.substring(0, 1).toUpperCase() + key.substring(1);
+                sbCountryDetails.append(key + "  :  " + value + "\n");
+            }
+//            data_to_show.add(new CountryTableCols("Country Name", jsonObject.optString("name").toString()));
+//            data_to_show.add(new CountryTableCols("Capital", jsonObject.optString("capital").toString()));
+
+
+//            sbCountryDetails.append("Country Name : ");
+//            sbCountryDetails.append(jsonObject.optString("name").toString() + "\n");
+
+
+//            sbCountryDetails.append("Country Capital : ");
+//            sbCountryDetails.append(jsonObject.optString("capital").toString() + "\n");
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
         mItemArrayList = CountryListRowItemDataBase.getInstance().getValues();
-        mItem = mItemArrayList.get(Integer.valueOf(index));
+        mItem = mItemArrayList.get(index_int);
 
         // Populate Detail Screen with contents
         if (mItem != null) {
@@ -67,9 +121,28 @@ public class ItemDetailFragment extends Fragment {
             if (appBarLayout != null) {
                 appBarLayout.setTitle(mItem.getCountryName());
             }
-            ((TextView) rootView.findViewById(R.id.item_detail)).setText(mItem.getCountryFlagURL());
-        }
 
+            ((TextView) rootView.findViewById(R.id.item_detail)).setText(sbCountryDetails.toString());
+
+        }
         return rootView;
     }
+
+    private String getArrayItems(String value){
+        try{
+            JSONArray ja = new JSONArray(value);
+            StringBuilder subString = new StringBuilder();
+            for(int i = 0; i < ja.length(); i++){
+                String delimiter = (i < (ja.length()-1)) ? "," : "";
+                subString.append(ja.get(i) + delimiter);
+            }
+            value = subString.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            return value;
+        }
+    }
+
+
 }

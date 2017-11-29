@@ -56,7 +56,9 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/iv_countryflag"
                     android:enabled="false"
-                    android:clickable="false" />
+                    android:clickable="false"
+                    android:layerType="software"
+                    />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

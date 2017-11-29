@@ -116,17 +116,12 @@ public class SimpleItemRecyclerViewAdapter
 
                     mValuesFilteredList = mValues;
                 } else {
-
                     ArrayList<CountryListRowItem> filteredList = new ArrayList<>();
-
                     for (CountryListRowItem countryListSingleItem : mValues) {
-
                         if (countryListSingleItem.getCountryName().toLowerCase().contains(charString)) {
-
                             filteredList.add(countryListSingleItem);
                         }
                     }
-
                     mValuesFilteredList = filteredList;
                 }
 
