@@ -84,29 +84,21 @@ public class ItemDetailFragment extends Fragment {
             jsonObject = jsonArray.getJSONObject(index_int);
 
             Iterator<String> keys = jsonObject.keys();
-            while( keys.hasNext() ){
+            while (keys.hasNext()) {
                 String key = keys.next();
                 String value = jsonObject.optString(key);
 
-                if(value.startsWith("[")){
+                if (value.startsWith("[")) {
                     value = getArrayItems(value);
+                }
+
+                if (value.startsWith("{")) {
+                    value = getNameValuePairs(key, value);
                 }
 
                 key = key.substring(0, 1).toUpperCase() + key.substring(1);
                 sbCountryDetails.append(key + "  :  " + value + "\n");
             }
-//            data_to_show.add(new CountryTableCols("Country Name", jsonObject.optString("name").toString()));
-//            data_to_show.add(new CountryTableCols("Capital", jsonObject.optString("capital").toString()));
-
-
-//            sbCountryDetails.append("Country Name : ");
-//            sbCountryDetails.append(jsonObject.optString("name").toString() + "\n");
-
-
-//            sbCountryDetails.append("Country Capital : ");
-//            sbCountryDetails.append(jsonObject.optString("capital").toString() + "\n");
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -126,6 +118,26 @@ public class ItemDetailFragment extends Fragment {
 
         }
         return rootView;
+    }
+
+    private String getNameValuePairs(String parentKey, String value) {
+        try {
+            JSONObject jsonObject = new JSONObject(value);
+            Iterator<String> subKeys = jsonObject.keys();
+            StringBuilder subString = new StringBuilder();
+            subString.append("\n");     // Do this only once
+
+            while (subKeys.hasNext()) {
+                String subkey = subKeys.next();
+                value = jsonObject.optString(subkey);
+                subString.append(parentKey + "_" + subkey + "  :  " + value + "\n");
+            }
+            value = subString.toString();
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        return value;
     }
 
     private String getArrayItems(String value){
