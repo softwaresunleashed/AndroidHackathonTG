@@ -68,11 +68,6 @@ public class ItemDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.item_detail, container, false);
 
-//        mContextFragment = this.getContext();
-
-//        TableView tableView = (TableView) rootView.findViewById(R.id.tableView);
-//        data_to_show = new ArrayList<CountryTableCols>();
-
         String index = getArguments().getString(ARG_ITEM_ID);
         int index_int = Integer.valueOf(index);
 
