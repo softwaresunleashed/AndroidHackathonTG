@@ -130,8 +130,11 @@ public class ItemDetailFragment extends Fragment {
             while (subKeys.hasNext()) {
                 String subkey = subKeys.next();
                 value = jsonObject.optString(subkey);
-                subString.append(parentKey + "_" + subkey + "  :  " + value + "\n");
+                subString.append(subkey + "  :  " + value + "\n");
+                //subString.append(parentKey + "_" + subkey + "  :  " + value + "\n");
             }
+
+            subString.append("\n");     // Do this only once
             value = subString.toString();
         } catch (JSONException e){
             e.printStackTrace();
